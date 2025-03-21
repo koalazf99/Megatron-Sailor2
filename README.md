@@ -64,3 +64,36 @@ bash run_train_qwen2_05b_sft.sh
 
 ### Acknowledgement
 Please refer to [Megatron-LLM-Documentation](https://epfllm.github.io/Megatron-LLM/guide/getting_started.html#setup) for more details.
+
+
+### Citation
+
+  ```
+@article{sailor2report,
+  title  = {Sailor2: Sailing in South-East Asia with Inclusive Multilingual LLM},
+  author = {Longxu Dou and Qian Liu and Fan Zhou and Changyu Chen and Zili Wang and Ziqi Jin and Zichen Liu and Tongyao Zhu and Cunxiao Du and Penghui Yang and Haonan Wang and Jiaheng Liu and Yongchi Zhao and Xiachong Feng and Xin Mao and Man Tsung Yeung and Kunat Pipatanakul and Fajri Koto and Min Si Thu and Hynek Kydl{\'\i}{\v{c}}ek and Zeyi Liu and Qunshu Lin and Sittipong Sripaisarnmongkol and Kridtaphad Sae-Khow and Nirattisai Thongchim and Taechawat Konkaew and Narong Borijindargoon and Anh Dao and Matichon Maneegard and Phakphum Artkaew and Zheng-Xin Yong and Quan Nguyen and Wannaphong Phatthiyaphaibun and Hoang H. Tran and Mike Zhang and Shiqi Chen and Tianyu Pang and Chao Du and Xinyi Wan and Wei Lu and Min Lin},
+  journal={arXiv preprint arXiv:2502.12982},
+  year   = {2025}
+}
+
+
+@software{epfmgtrn,
+  author       = {Alejandro Hernández Cano  and
+                  Matteo Pagliardini  and
+                  Andreas Köpf  and
+                  Kyle Matoba  and
+                  Amirkeivan Mohtashami  and
+                  Xingyao Wang  and
+                  Olivia Simin Fan  and
+                  Axel Marmet  and
+                  Deniz Bayazit  and
+                  Igor Krawczuk  and
+                  Zeming Chen  and
+                  Francesco Salvi  and
+                  Antoine Bosselut  and
+                  Martin Jaggi},
+  title        = {epfLLM Megatron-LLM},
+  year         = 2023,
+  url          = {https://github.com/epfLLM/Megatron-LLM}
+}
+  ```

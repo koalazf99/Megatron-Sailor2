@@ -62,7 +62,7 @@ def _vocab_size_with_padding(orig_vocab_size, args):
         args.tensor_model_parallel_size
 
     if args.tokenizer_type in ['Qwen2Tokenizer', 'Qwen2ChatTokenizer']:
-        multiple = 151936
+        multiple = 152064
 
     while (after % multiple) != 0:
         after += 1

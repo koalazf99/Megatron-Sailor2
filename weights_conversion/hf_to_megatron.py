@@ -57,13 +57,13 @@ llama_s2dense = {7: 11008, 13: 13824, 30: 17920, 34: 22016, 65: 22016,
 llama_s2hidden = {7: 4096, 13: 5120, 30: 6656, 34: 8192, 65: 8192, 70: 8192}
 
 
-qwen_s2layer = {5: 24, 24: 48, 15: 28, 7: 28, 8: 32, 14: 48, 18: 64, 20: 64, 32: 64} #num_hidden_layers
-qwen_s2heads = {5: 14, 24: 14, 15: 12, 7: 28, 8: 28, 14: 40, 18: 40, 20: 40, 32: 40} #num_attention_heads
-qwen_s2kvheads = {5: 2, 24: 2, 15: 2, 7: 4, 8: 4, 14: 8, 18: 8, 20: 8, 32: 8} #num_key_value_heads
-qwen_s2dense = {5: 4864, 24: 4864, 15: 8960, 7: 18944, 8: 18944, 14: 13824, 18: 13824, 20: 13824, 32: 27648} #intermediate_size
-qwen_s2hidden = {5: 896, 24: 896, 15: 1536, 7: 3584, 8: 3584, 14: 5120, 18: 5120, 20: 5120, 32: 5120} #hidden_size
-qwen_s2rope = {5: 1e6, 24: 1e6, 15: 1e6, 7: 1e6, 8: 1e6, 14: 1e6, 18: 1e6, 20: 1e6, 32: 1e6} #rope_theta
-qwen_s2vocab = {5: 151936, 24: 151936, 15: 151936, 7: 152064, 8: 152064, 14: 152064, 18: 152064, 20: 152064, 32: 152064} #padded_vocab_size
+qwen_s2layer = {5: 24, 24: 48, 15: 28, 7: 28, 8: 32, 14: 48, 18: 64, 20: 64, 32: 64, 3: 36} #num_hidden_layers
+qwen_s2heads = {5: 14, 24: 14, 15: 12, 7: 28, 8: 28, 14: 40, 18: 40, 20: 40, 32: 40, 3: 16} #num_attention_heads
+qwen_s2kvheads = {5: 2, 24: 2, 15: 2, 7: 4, 8: 4, 14: 8, 18: 8, 20: 8, 32: 8, 3: 2} #num_key_value_heads
+qwen_s2dense = {5: 4864, 24: 4864, 15: 8960, 7: 18944, 8: 18944, 14: 13824, 18: 13824, 20: 13824, 32: 27648, 3: 11008} #intermediate_size
+qwen_s2hidden = {5: 896, 24: 896, 15: 1536, 7: 3584, 8: 3584, 14: 5120, 18: 5120, 20: 5120, 32: 5120, 3: 2048} #hidden_size
+qwen_s2rope = {5: 1e6, 24: 1e6, 15: 1e6, 7: 1e6, 8: 1e6, 14: 1e6, 18: 1e6, 20: 1e6, 32: 1e6, 3: 1e6} #rope_theta
+qwen_s2vocab = {5: 151936, 24: 151936, 15: 151936, 7: 152064, 8: 152064, 14: 152064, 18: 152064, 20: 152064, 32: 152064, 3: 151936} #padded_vocab_size
 
 def falcon_to_megatron(weights: dict, size: int) -> dict:
     def permute(qkv_w):
@@ -576,7 +576,7 @@ if __name__ == "__main__":
     parser = ArgumentParser(description="Convert Huggingface llama or falcon weights to "
                                         "megatron-compatible weights")
     parser.add_argument("model", choices={"falcon", "llama", "llama2", "codellama", "mistral", "qwen", "gemma"})
-    parser.add_argument("--size", default=7, choices={2, 5, 24, 15, 18, 4, 7, 8, 9, 13, 14, 18, 20, 30, 32, 34, 40, 65, 70}, type=int,
+    parser.add_argument("--size", default=7, choices={2, 3, 5, 24, 15, 18, 4, 7, 8, 9, 13, 14, 18, 20, 30, 32, 34, 40, 65, 70}, type=int,
                         help="The size of the model")
     parser.add_argument("--out", type=Path,
                         help="Directory to store the megatron weights (as checkpoint)")
@@ -598,7 +598,7 @@ if __name__ == "__main__":
     elif args.model == "mistral":
         assert args.size in {7}
     elif args.model == "qwen":
-        assert args.size in {5, 24, 15, 18, 4, 7, 8, 14, 18, 20, 32}  
+        assert args.size in {3, 5, 24, 15, 18, 4, 7, 8, 14, 18, 20, 32}  
     elif args.model == "gemma":
         assert args.size in {2, 7, 9}  
     else:

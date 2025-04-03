@@ -503,6 +503,11 @@ def write_qwen_model(
             config = AutoConfig.from_pretrained('Qwen/Qwen2.5-14B') 
             config.num_hidden_layers=64
             config.rms_norm_eps=1e-6
+        elif size==32:
+            config = AutoConfig.from_pretrained('Qwen/Qwen2.5-32B')
+            config.num_hidden_layers=64
+            config.tie_word_embeddings=False
+            config.rms_norm_eps=1e-6
         else:
             raise NotImplementedError
 

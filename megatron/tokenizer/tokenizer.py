@@ -62,6 +62,7 @@ def _vocab_size_with_padding(orig_vocab_size, args):
         args.tensor_model_parallel_size
 
     if args.tokenizer_type in ['Qwen2Tokenizer', 'Qwen2ChatTokenizer']:
+        # FIXME: @fan note for 32B, the vocab size is 152064, but for 3B, the vocab size is 151936
         multiple = 152064
 
     while (after % multiple) != 0:

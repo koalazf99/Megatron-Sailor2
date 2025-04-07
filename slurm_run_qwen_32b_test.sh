@@ -1,14 +1,14 @@
 #!/bin/bash
 #SBATCH --job-name=megatron-slm-math
-#SBATCH --nodes=4
-#SBATCH --ntasks=4
+#SBATCH --nodes=8
+#SBATCH --ntasks=8
 #SBATCH --gpus-per-task=8
 #SBATCH --cpus-per-task=50
 #SBATCH --mem=0
 #SBATCH --gres=gpu:8
 #SBATCH --output=/mbz/users/fan.zhou/tron/Megatron-Sailor2/slurm/slurm_2nodes_%j.log
 #SBATCH --error=/mbz/users/fan.zhou/tron/Megatron-Sailor2/slurm/slurm_2nodes_%j.log
-#SBATCH --exclude=g42-h100-instance-[065,066,078,084,085,070,135,139,210,124,125,127,095,096,129,186,191,192,243,244,239,246,224,092,067,144,218-219,071,181,089,153,222,243,244,113,112]
+#SBATCH --exclude=g42-h100-instance-[065,066,078,084,085,070,135,139,210,124,125,127,095,096,129,191,108,224,241-245,090,091,192,130,144,181,067,151,208,068,216,222,113,109,110]
 
 #SBATCH --partition=higherprio
 
@@ -24,7 +24,7 @@ conda deactivate
 
 export CUDA_DEVICE_MAX_CONNECTIONS=1
 GPUS_PER_NODE=8
-NNODES=4
+NNODES=8
 
 nodes=( $( scontrol show hostnames $SLURM_JOB_NODELIST ) )
 nodes_array=($nodes)
@@ -52,10 +52,10 @@ parent_directory=$(dirname "$current_directory")
 # LOG_ARGS="--log_interval 1 --save_interval 2500 --eval_interval 500 --eval_iters 10"
 
 #training
-LOG_ARGS="--log_interval 1 --save_interval 100 --eval_interval 100 --eval_iters 10"
+LOG_ARGS="--log_interval 1 --save_interval 500 --eval_interval 500 --eval_iters 10"
 
-TRAIN_ARGS="--train_iters 2500 --lr_decay_style constant --weight_decay 0.01 
---lr_warmup_iters 0 --lr 5e-5 --min_lr 5e-5
+TRAIN_ARGS="--train_iters 25000 --lr_decay_style constant --weight_decay 0.01 
+--lr_warmup_iters 0 --lr 5e-6 --min_lr 5e-6 
 --adam_beta1 0.9 --adam_beta2 0.95 --adam_eps 1e-5"
 TRAIN_ARGS+=" --override_opt_param_scheduler"
 
@@ -79,36 +79,35 @@ COMMON_ARGS="--hidden_dropout 0.0 --attention_dropout 0.0 --no_bias_gelu_fusion 
 --no_query_key_layer_scaling --attention_softmax_in_fp32 --intra_doc"
 
 WANDB_ARGS="--wandb_logger --wandb_project megamath
---wandb_entity fanzhou --wandb_id megamath_3b_t4p1_final
+--wandb_entity fanzhou --wandb_id megamath_32b_t8p2_final_100B_8node
 --wandb_api_key 99bf1d8cdfb7226ae980b4cf8e12d840f05cdb24"
 # WANDB_ARGS=""
 
 
 #####training mode stage 1#####
 
-MEGATRON_Trains=()
+# Data	Tokens	mix ratio-1	mega weight-1
+# DCLM-pro	15.5	0.05	0.328225806
+# MM-Code	21.5	0.025	0.118313953
+# MM-Trans. Code	5.5	0.025	0.4625
+# MM-QA	6.25	0.15	2.442
+# MM-Text-Code-Block	40.25	0.15	0.379192547
+# MM-Web-Pro	12.75	0.6	4.788235294
 
-# for i in {1..57}
-# do
-#     # 4位数字
-#     num_str=$(printf "%04d" $i)
-#     MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro_max/web_pro_max_${i}_text_document")
-# done
-
-# web_pro_max
-for i in {1..57}
+# dclm_pro
+for i in {1..14}
 do
     # 4位数字
     num_str=$(printf "%04d" $i)
-    MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro_max/web_pro_max_${num_str}")
+    MEGATRON_Trains+=("0.328225806 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/dclm-pro_merged/dclm-pro_${num_str}")
 done
 
-# qa
-for i in {1..5}
+# web_pro
+for i in {0..12}
 do
     # 4位数字
     num_str=$(printf "%04d" $i)
-    MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/qa_merged/qa_${num_str}")
+    MEGATRON_Trains+=("4.788235294 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro_merged/web_pro_${num_str}")
 done
 
 # code
@@ -116,7 +115,7 @@ for i in {1..16}
 do
     # 4位数字
     num_str=$(printf "%04d" $i)
-    MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/code_merged/code_${num_str}")
+    MEGATRON_Trains+=("0.118313953 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/code_merged/code_${num_str}")
 done
 
 # translated code
@@ -124,24 +123,28 @@ for i in {1..4}
 do
     # 4位数字
     num_str=$(printf "%04d" $i)
-    MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/translated_code_merged/translated_code_${num_str}")
+    MEGATRON_Trains+=("0.4625 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/translated_code_merged/translated_code_${num_str}")
 done
 
-# text_code_block
-for i in {1..32}
+# qa
+for i in {0..5}
 do
     # 4位数字
     num_str=$(printf "%04d" $i)
-    MEGATRON_Trains+=("1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/text_code_block_merged/text_code_block_${num_str}")
+    MEGATRON_Trains+=("2.442 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/qa_merged/qa_${num_str}")
+done
+
+# text-code-block
+for i in {0..32}
+do
+    # 4位数字
+    num_str=$(printf "%04d" $i)
+    MEGATRON_Trains+=("0.379192547 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/text_code_block_merged/text_code_block_${num_str}")
 done
 
 
 MEGATRON_Valids=(
-	1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro_max_merged/web_pro_max_0000
-    # 1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/qa_merged/qa_0000
-    # 1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/code_merged/code_0000
-    # 1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/translated_code_merged/translated_code_0000
-    # 1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/text_code_block_merged/text_code_block_0000
+	1 /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro/web_pro_149_text_document
 )
 
 #####training mode stage 2#####
@@ -196,15 +199,15 @@ srun --container-name=stanford_2 --container-mounts="/mbz:/mnt" \
     --container-image=/mbz/users/fan.zhou/tron/Megatron-Sailor2/stanford_2.sqsh \
     --chdir=/mbz/users/fan.zhou/tron/Megatron-Sailor2 \
     torchrun ${DISTRIBUTED_ARGS[@]} /mbz/users/fan.zhou/tron/Megatron-Sailor2/finetune.py \
-    --tensor_model_parallel_size 4 \
+    --tensor_model_parallel_size 8 \
 	--pipeline_model_parallel_size 2 \
-	--load /mbz/users/fan.zhou/tron/ckpts/qwen_7b_megatron_t4p2  \
-	--save /mbz/users/fan.zhou/tron/ckpts/qwen_7b_megatron_t4p2_cpt  \
-	--tensorboard_dir /mbz/users/fan.zhou/tron/ckpts/qwen_7b_megatron_t4p2_cpt/logs/ \
+	--load /mbz/users/fan.zhou/tron/ckpts/qwen_32b_megatron_t8p2  \
+	--save /mbz/users/fan.zhou/tron/ckpts/qwen_32b_megatron_t8p2_cpt  \
+	--tensorboard_dir /mbz/users/fan.zhou/tron/ckpts/qwen_32b_megatron_t8p2_cpt/logs/ \
 	--model_name qwen \
 	--tokenizer_type Qwen2Tokenizer \
-	--vocab_file Qwen/Qwen2.5-7B  \
-	--micro_batch_size 2 \
+	--vocab_file Qwen/Qwen2.5-32B  \
+	--micro_batch_size 4 \
 	--global_batch_size 1024 \
     --sequence_parallel \
     --recompute_granularity selective \

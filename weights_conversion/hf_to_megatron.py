@@ -468,7 +468,7 @@ def main(model_name: str = "falcon", size: int = 7, out: Optional[Path] = None,
             "glu_activation": "swiglu",  # hf document
             "padded_vocab_size": qwen_s2vocab[size], #config
             "use_rms_norm": True, # hf document
-            "tie_embed_logits": True if size in [5, 15] else False, #config
+            "tie_embed_logits": True if size in [3, 5, 15] else False, #config
             "tokenizer_type": "Qwen2ChatTokenizer" if '_sft_' in output_path else "Qwen2Tokenizer", #no
             "max_position_embeddings": 32768, #config
             "seq_length": 32768, #no 

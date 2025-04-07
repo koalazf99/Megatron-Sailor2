@@ -40,10 +40,10 @@ python tools/checkpoint_util.py \
 # preprocess: tokenize the dataset
 enroot start -w --mount /mbz:/mnt stanford_2
 python tools/preprocess_data_parquet.py \
-	--input /mbz/users/fan.zhou/tron/Megatron-Sailor2/jsonl_dataset/web_pro_max \
-	--output_prefix /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/web_pro_max/web_pro_max \
+	--input /mbz/users/fan.zhou/tron/Megatron-Sailor2/jsonl_dataset/dclm-pro \
+	--output_prefix /mbz/users/fan.zhou/tron/Megatron-Sailor2/dataset/dclm-pro/dclm-pro \
 	--tokenizer_type Qwen2Tokenizer \
-	--vocab_file Qwen/Qwen2.5-3B  \
+	--vocab_file Qwen/Qwen2.5-7B  \
 	--chunk_size 32 \
 	--workers 128 \
 	--log_interval 20000 \
